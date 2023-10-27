@@ -39,7 +39,7 @@ def build_cmake_project(args):
         cmake_args.extend(["-G", "Xcode"])
         lib_file_extension = ".a"  # Change this to ".dylib" for dynamic libraries
         lib_file_name = "libmarl"
-        lib_file_path = f"{build_dir}/{lib_file_name}{lib_file_extension}"
+        lib_file_path = f"{build_dir}/{'Debug' if args.config == 'debug' else 'Release'}/{lib_file_name}{lib_file_extension}"
         lib_file_prefix = "lib"
     elif args.platform == "android":
         cmake_args.extend([
@@ -59,7 +59,7 @@ def build_cmake_project(args):
     subprocess.check_call(cmake_args, cwd=build_dir)
 
     # Build the generated solution
-    build_args = ["cmake", "--build", build_dir, "--config", args.config]
+    build_args = ["cmake", "--build", build_dir, "--config", "Debug" if args.config == "debug" else "Release"]
     subprocess.check_call(build_args)
     
     return {
