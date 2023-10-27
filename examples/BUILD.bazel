@@ -51,3 +51,13 @@ cc_binary(
         "//:marl",
     ],
 )
+
+cc_binary(
+    name = "hello_task2",
+    srcs = [
+        "hello_task2.cpp",
+    ],
+    deps = [
+        "//:marl",
+    ],
+)

@@ -420,6 +420,7 @@ if(MARL_BUILD_EXAMPLES)
 
     build_example(fractal)
     build_example(hello_task)
+    build_example(hello_task2)
     build_example(primes)
     build_example(tasks_in_tasks)
 endif(MARL_BUILD_EXAMPLES)
