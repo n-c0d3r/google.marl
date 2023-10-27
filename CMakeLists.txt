@@ -289,6 +289,13 @@ if(NOT MSVC)
     target_compile_options(marl PRIVATE "-fvisibility=hidden")
 endif()
 
+if(MSVC)
+    target_compile_options(marl PRIVATE
+        $<$<CONFIG:Debug>:/MTd>
+        $<$<CONFIG:Release>:/MT>
+    )
+endif()
+
 set_target_properties(marl PROPERTIES
     POSITION_INDEPENDENT_CODE 1
     VERSION ${MARL_VERSION}

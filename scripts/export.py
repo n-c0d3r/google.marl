@@ -27,17 +27,20 @@ def build_cmake_project(args):
     lib_file_extension = ""
     lib_file_name = ""
     lib_file_path = ""
+    lib_file_prefix = ""
 
     if args.platform == "windows":
         cmake_args.extend(["-G", f"Visual Studio {args.vs_version} {'2019' if args.vs_version == 16 else '2022'}"])
         lib_file_extension = ".lib"
         lib_file_name = "marl"
         lib_file_path = f"{build_dir}/{'Debug' if args.config == 'debug' else 'Release'}/{lib_file_name}{lib_file_extension}"
+        lib_file_prefix = ""
     elif args.platform == "macos":
         cmake_args.extend(["-G", "Xcode"])
         lib_file_extension = ".a"  # Change this to ".dylib" for dynamic libraries
         lib_file_name = "libmarl"
         lib_file_path = f"{build_dir}/{lib_file_name}{lib_file_extension}"
+        lib_file_prefix = "lib"
     elif args.platform == "android":
         cmake_args.extend([
             "-G", "Unix Makefiles",
@@ -48,6 +51,7 @@ def build_cmake_project(args):
         lib_file_extension = ".a"
         lib_file_name = "libmarl"
         lib_file_path = f"{build_dir}/{lib_file_name}{lib_file_extension}"
+        lib_file_prefix = "lib"
 
     cmake_args.append("-DCMAKE_BUILD_TYPE=" + args.config)
 
@@ -62,7 +66,8 @@ def build_cmake_project(args):
         "project_root": project_root,
         "lib_file_path": lib_file_path,
         "include_dir": f"{project_root}/include",
-        "lib_file_extension": lib_file_extension
+        "lib_file_extension": lib_file_extension,
+        "lib_file_prefix": lib_file_prefix
     }
 
 def export_project(build_info, args):
@@ -78,6 +83,64 @@ def export_project(build_info, args):
     # Copy include directory
     shutil.copytree(build_info["include_dir"], f"{build_info['project_root']}/build/export/include", dirs_exist_ok=True)
 
+def get_godot_platform_name(platform):
+    if args.platform == "windows":
+        return "windows"
+    elif args.platform == "macos":
+        return "macos"
+    elif args.platform == "android":
+        return "android"
+
+def get_godot_arch_name(arch):
+    if args.arch == "x86":
+        return "x86"
+    elif args.arch == "x86_64":
+        return "x86_64"
+    elif args.arch == "armeabi-v7a":
+        return "arm32"
+    elif args.arch == "arm64-v8a":
+        return "arm64"
+
+def get_godot_config_name(config):
+    if args.config == "debug":
+        return "template_debug"
+    elif args.config == "release":
+        return "template_release"
+
+def export_godot_compatible_lib(build_info, args):
+    export_dir = f"{build_info['project_root']}/build/export/gdcompatible_libs"
+    
+    # Create directories if they do not exist
+    os.makedirs(export_dir, exist_ok=True)
+
+    # prepare args
+    platform = get_godot_platform_name(args.platform);
+    arch = get_godot_arch_name(args.arch);
+    config = get_godot_config_name(args.arch);
+
+    # file
+    lib_file_prefix = build_info['lib_file_prefix']
+    lib_file_extension = build_info['lib_file_extension']
+
+    # copy files
+    shutil.copy(
+        build_info["lib_file_path"], 
+        f"{export_dir}/{lib_file_prefix}marl.{platform}.{config}.{arch}{lib_file_extension}"
+    )
+    if args.config == "release":  
+        shutil.copy(
+            build_info["lib_file_path"], 
+            f"{export_dir}/{lib_file_prefix}marl.{platform}.editor.{arch}{lib_file_extension}"
+        )   
+        shutil.copy(
+            build_info["lib_file_path"], 
+            f"{export_dir}/{lib_file_prefix}marl.{platform}.editor.dev.{arch}{lib_file_extension}"
+        )
+    shutil.copy(
+        build_info["lib_file_path"], 
+        f"{export_dir}/{lib_file_prefix}marl.{platform}.{config}.dev.{arch}{lib_file_extension}"
+    )
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Build CMake project.')
     parser.add_argument('--platform', default='windows', help='Platform to build for (windows|macos|android)')
@@ -91,3 +154,4 @@ if __name__ == "__main__":
     build_info = build_cmake_project(args)
     
     export_project(build_info, args)
+    export_godot_compatible_lib(build_info, args)
