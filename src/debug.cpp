@@ -27,7 +27,9 @@ namespace marl {
 void fatal(const char* msg, ...) {
   va_list vararg;
   va_start(vararg, msg);
+#ifndef __ANDROID__
   vfprintf(stderr, msg, vararg);
+#endif
   va_end(vararg);
   abort();
 }
@@ -35,7 +37,9 @@ void fatal(const char* msg, ...) {
 void warn(const char* msg, ...) {
   va_list vararg;
   va_start(vararg, msg);
+#ifndef __ANDROID__
   vfprintf(stdout, msg, vararg);
+#endif
   va_end(vararg);
 }
 
