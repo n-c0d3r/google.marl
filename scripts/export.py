@@ -66,6 +66,7 @@ def build_cmake_project(args):
         "project_root": project_root,
         "lib_file_path": lib_file_path,
         "include_dir": f"{project_root}/include",
+        "src_dir": f"{project_root}/src",
         "lib_file_extension": lib_file_extension,
         "lib_file_prefix": lib_file_prefix
     }
@@ -82,6 +83,9 @@ def export_project(build_info, args):
     
     # Copy include directory
     shutil.copytree(build_info["include_dir"], f"{build_info['project_root']}/build/export/include", dirs_exist_ok=True)
+    
+    # Copy src directory
+    shutil.copytree(build_info["src_dir"], f"{build_info['project_root']}/build/export/src", dirs_exist_ok=True)
 
 def get_godot_platform_name(platform):
     if args.platform == "windows":
