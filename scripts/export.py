@@ -44,13 +44,24 @@ def build_cmake_project(args):
     elif args.platform == "android":
         cmake_args.extend([
             "-G", "Unix Makefiles",
-            "-DCMAKE_TOOLCHAIN_FILE:PATH=" + os.environ['ANDROID_NDK_ROOT'] + "/build/cmake/android.toolchain.cmake",
-            "-DANDROID_ABI=" + args.arch,
-            "-DANDROID_NATIVE_API_LEVEL=" + str(args.android_api_level)
+            f"-DCMAKE_TOOLCHAIN_FILE:PATH={os.environ['ANDROID_NDK_ROOT']}/build/cmake/android.toolchain.cmake",
+            f"-DANDROID_ABI={args.arch}",
+            f"-DANDROID_NATIVE_API_LEVEL={str(args.android_api_level)}"
         ])
         lib_file_extension = ".a"
         lib_file_name = "libmarl"
         lib_file_path = f"{build_dir}/{lib_file_name}{lib_file_extension}"
+        lib_file_prefix = "lib"
+    elif args.platform == "ios":
+        cmake_arg_arch = "OS"
+        cmake_args.extend(["-G", "Xcode"])
+        cmake_args.extend([
+            f"-DCMAKE_TOOLCHAIN_FILE:PATH={project_root}/submodules/ios-cmake/ios.toolchain.cmake",
+            f"-DPLATFORM={cmake_arg_arch}"
+        ])
+        lib_file_extension = ".a"  # Change this to ".dylib" for dynamic libraries
+        lib_file_name = "libmarl"
+        lib_file_path = f"{build_dir}/{'Debug-iphoneos' if args.config == 'debug' else 'Release-iphoneos'}/{lib_file_name}{lib_file_extension}"
         lib_file_prefix = "lib"
 
     cmake_args.append("-DCMAKE_BUILD_TYPE=" + args.config)
@@ -94,6 +105,8 @@ def get_godot_platform_name(platform):
         return "macos"
     elif args.platform == "android":
         return "android"
+    elif args.platform == "ios":
+        return "ios"
 
 def get_godot_arch_name(arch):
     if args.arch == "x86":
