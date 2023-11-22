@@ -53,7 +53,7 @@ def build_cmake_project(args):
         lib_file_path = f"{build_dir}/{lib_file_name}{lib_file_extension}"
         lib_file_prefix = "lib"
     elif args.platform == "ios":
-        cmake_arg_arch = "OS"
+        cmake_arg_arch = "OS64COMBINED" if (args.arch == "x86_64") else "OS"
         cmake_args.extend(["-G", "Xcode"])
         cmake_args.extend([
             f"-DCMAKE_TOOLCHAIN_FILE:PATH={project_root}/submodules/ios-cmake/ios.toolchain.cmake",
