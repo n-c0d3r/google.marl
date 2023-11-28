@@ -86,7 +86,21 @@ namespace marl {
 ////////////////////////////////////////////////////////////////////////////////
 MARL_INSTANTIATE_THREAD_LOCAL(Scheduler*, Scheduler::bound, nullptr);
 
+Scheduler* _defaultScheduler;
+
+void Scheduler::set_default(Scheduler* defaultScheduler) {
+  _defaultScheduler = defaultScheduler;
+}
+
+Scheduler* Scheduler::get_default() {
+  return _defaultScheduler;
+}
+
 Scheduler* Scheduler::get() {
+
+  if(!bound)
+    setBound(_defaultScheduler);
+
   return bound;
 }
 

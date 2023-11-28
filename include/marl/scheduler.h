@@ -102,6 +102,12 @@ class Scheduler {
   MARL_EXPORT
   ~Scheduler();
 
+  MARL_EXPORT
+  static void set_default(Scheduler*);
+
+  MARL_EXPORT
+  static Scheduler* get_default();
+
   // get() returns the scheduler bound to the current thread.
   MARL_EXPORT
   static Scheduler* get();
@@ -515,6 +521,7 @@ class Scheduler {
     GUARDED_BY(mutex) WorkerByTid byTid;
   };
   SingleThreadedWorkers singleThreadedWorkers;
+
 };
 
 ////////////////////////////////////////////////////////////////////////////////
